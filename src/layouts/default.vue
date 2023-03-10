@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { showNotify } from 'vant';
 const show = ref(false);
 
 const showNotify = () => {
@@ -41,7 +40,7 @@ const tabbars = ref<tabbarType[]>([
 </script>
 
 <template>
-    <div>
+    <div class="main">
         <van-nav-bar title="考研交流" @click-right="showNotify">
             <template #right>
                 <van-icon name="bell" color="gray" />
@@ -50,14 +49,32 @@ const tabbars = ref<tabbarType[]>([
         <van-notify v-model:show="show" type="warning">
             <span>开发中...</span>
         </van-notify>
-
-        <router-view />
+        <div class="container">
+            <router-view />
+        </div>
         <van-tabbar route>
             <van-tabbar-item v-for="item in tabbars" :icon="item.iconName" :to="item.pageName" replace>{{
                 item.name
             }}</van-tabbar-item>
         </van-tabbar>
+        <div class="bottom-box"></div>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.main {
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-box {
+    height: 50px;
+    flex-shrink: 0
+}</style>

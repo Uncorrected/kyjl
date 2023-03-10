@@ -1,56 +1,56 @@
 <script setup lang="ts">
-const searchValue = ref<string>('');
+import { getPostList, queryTyep } from '@/api/post';
 
-const noticeList = ref([
-    {
-        uuid: 'a',
-        text: '广东考研分数查询通道已开启，请留言相关资讯文章'
-    }, {
-        uuid: 'b',
-        text: '某高校一名考生作弊，以及被劝退'
-    }, {
-        uuid: 'c',
-        text: '复试即将开始，请通过官方入口完成'
+const searchValue = ref<string>('');
+const onSearch = async (value: string) => {
+    const res = await loadingPost({ key: value });
+    console.log(res);
+}
+const changeValue = (() => {
+    let timer: number;
+    return function (value: string) {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            const res = await loadingPost({ key: value });
+            console.log(res);
+        }, 1500);
     }
-]);
+})()
+
+const notice = ref('无论我们能活多久，我们能够享受的只有无法分割的此刻，此外别无其他。');
 
 interface post {
-    readonly id: number,
+    readonly uuid: string,
     imgURL: string,
     title: string,
     author: string,
     summary: string,
     date: string,
 }
-const list = ref<post[]>([
-    {
-        id: 1,
-        title: '第一篇文章',
-        imgURL: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-        author: '张三',
-        summary: '只是单纯记录一下最近维护了几个项目之后的感触，也只是在自己现在水平上面的一些感觉。发发牢骚，水水文章,只是单纯记录一下最近维护了几个项目之后的感触，也只是在自己现在水平上面的一些感觉。发发牢骚，水水文章只是单纯记录一下最近维护了几个项目之后的感触，也只是在自己现在水平上面的一些感觉。发发牢骚，水水文章,只是单纯记录一下最近维护了几个项目之后的感触，也只是在自己现在水平上面的一些感觉。发发牢骚，水水文章',
-        date: '2022-11-16',
-    }, {
-        id: 2,
-        title: '第二篇文章',
-        imgURL: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-        author: '李四',
-        summary: '加油',
-        date: '2022-11-18',
-    }
-]);
+const list = ref<post[]>();
+const loadingPost = async ({ page, pageSize, key }: queryTyep) => {
+    const res = await getPostList({ page, pageSize, key });
+    console.log(res);
+    list.value = res.data.postList;
+}
+loadingPost({});
+
+const isLoading = ref(false);
+const onRefresh = async () => {
+    await loadingPost({});
+    isLoading.value = false;
+};
 </script>
 
 <template>
-    <div>
-        <van-search v-model="searchValue" placeholder="请输入搜索关键词" />
+    <van-sticky>
+        <van-search v-model="searchValue" placeholder="请输入搜索关键词" @search="onSearch" @update:model-value="changeValue"
+            @clear="loadingPost" />
+    </van-sticky>
 
-        <van-notice-bar left-icon="volume-o" :scrollable="false" mode="closeable">
-            <van-swipe vertical class="notice-swipe" :autoplay="3000" :show-indicators="false">
-                <van-swipe-item v-for="item in noticeList">{{ item.text }}</van-swipe-item>
-            </van-swipe>
-        </van-notice-bar>
+    <van-notice-bar left-icon="volume-o" mode="closeable" :text="notice" />
 
+    <van-pull-refresh class="pull-refresh" v-model="isLoading" success-text="刷新成功" @refresh="onRefresh">
         <van-card v-for="item in list" :title="item.title" :thumb="item.imgURL">
             <template #desc>
                 <div class="desc">
@@ -76,13 +76,18 @@ const list = ref<post[]>([
                 </van-space>
             </template>
         </van-card>
-    </div>
+    </van-pull-refresh>
+    <van-back-top right="6vw" bottom="8vh" />
 </template>
 
 <style scoped>
 .notice-swipe {
-    height: 40px;
-    line-height: 40px;
+    height: 80px;
+    line-height: 80px;
+}
+
+.pull-refresh {
+    flex: 1;
 }
 
 .desc {
