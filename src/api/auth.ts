@@ -1,4 +1,6 @@
 import instance from '@/utils/request';
+import type { PostData } from './requestType';
+
 
 interface LoginForm {
     username: string,
@@ -24,13 +26,11 @@ interface RegisterForm {
     school: string,
 };
 
-const api = {
-    login: '/auth/login',
-    register: '/users',
-};
+const login: PostData<LoginForm, LoginResponse> = (data) => {
+    return instance.post('/auth/login', data);
+}
 
-const login = (data: LoginForm) => instance.post<LoginResponse>(api.login, data);
-const register = (data: RegisterForm) => instance.post(api.register, data);
+const register = (data: RegisterForm) => instance.post('/users', data);
 
 export {
     login,

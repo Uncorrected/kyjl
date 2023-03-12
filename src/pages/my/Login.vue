@@ -21,8 +21,8 @@ const onLogin = async (values: any) => {
     // console.log(res);
     const userStore = useUserStore();
     userStore.$patch((state) => {
-        state.token = res.data.token;
-        state.user = res.data.user;
+        state.token = res.token;
+        state.user = res.user;
     });
     onBack();
 };

@@ -49,9 +49,20 @@ const tabbars = ref<tabbarType[]>([
         <van-notify v-model:show="show" type="warning">
             <span>开发中...</span>
         </van-notify>
+
         <div class="container">
-            <router-view />
+            <router-view v-slot="{ Component, route }">
+                <keep-alive>
+                    <suspense>
+                        <template #default>
+                            <component :is="Component" :key="route.meta.usePathKey ? route.path : undefined" />
+                        </template>
+                        <template #fallback> Loading... </template>
+                    </suspense>
+                </keep-alive>
+            </router-view>
         </div>
+
         <van-tabbar route>
             <van-tabbar-item v-for="item in tabbars" :icon="item.iconName" :to="item.pageName" replace>{{
                 item.name
@@ -77,4 +88,5 @@ const tabbars = ref<tabbarType[]>([
 .bottom-box {
     height: 50px;
     flex-shrink: 0
-}</style>
+}
+</style>

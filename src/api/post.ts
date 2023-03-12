@@ -1,18 +1,27 @@
 import instance from '@/utils/request';
+import type { PostData } from './requestType';
+
 interface queryTyep {
     page?: number,
     pageSize?: number,
     key?: string,
 }
+interface postResponse {
+    readonly uuid: string,
+    imgURL: string,
+    title: string,
+    author: string,
+    summary: string,
+    date: string,
+    liveTotal: number,
+    comentTotal: number,
+}
 
-const api = {
-    post: '/post'
-};
-
-const getPostList = ({ page = 1, pageSize = 10, key }: queryTyep) => instance.get(api.post, { params: { page, pageSize, key } });
+const getPostList: PostData<queryTyep, postResponse[]> = (data) => instance.get('/post', { params: data });
 
 export type {
-    queryTyep
+    queryTyep,
+    postResponse
 }
 
 export {

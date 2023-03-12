@@ -34,13 +34,13 @@ export default defineConfig({
   },
   server: {
     host: true,
-    proxy: {
-      "/api": {
-        target: 'https://mock.apifox.cn/m1/2414200-0-default',
-        // target: 'http://localhost:3000/api',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, "")
-      }
-    }
+    // proxy: {
+    //   "/api": {
+    //     target: 'https://mock.apifox.cn/m1/2414200-0-default',
+    //     // target: 'http://localhost:3000/api',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, "")
+    //   }
+    // }
   },
 })

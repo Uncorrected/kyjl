@@ -1,90 +1,93 @@
 <script setup lang="ts">
-import { getPostList, queryTyep } from '@/api/post';
+import type { ListInstance } from 'vant';
+import { getPostList, queryTyep, postResponse } from '@/api/post';
 
+// 搜索
 const searchValue = ref<string>('');
-const onSearch = async (value: string) => {
-    const res = await loadingPost({ key: value });
-    console.log(res);
-}
 const changeValue = (() => {
     let timer: number;
     return function (value: string) {
         clearTimeout(timer);
         timer = setTimeout(async () => {
             const res = await loadingPost({ key: value });
-            console.log(res);
+            list.value = res;
+            listRef.value?.check();
+            console.log(listRef)
         }, 1500);
     }
 })()
 
+// 公告
 const notice = ref('无论我们能活多久，我们能够享受的只有无法分割的此刻，此外别无其他。');
 
-interface post {
-    readonly uuid: string,
-    imgURL: string,
-    title: string,
-    author: string,
-    summary: string,
-    date: string,
+// 获取文章列表
+const list = ref<postResponse[]>([]);
+const loadingPost = async ({ page = 1, pageSize = 10, key = '' }: queryTyep) => {
+    return await getPostList({ page, pageSize, key });
 }
-const list = ref<post[]>();
-const loadingPost = async ({ page, pageSize, key }: queryTyep) => {
-    const res = await getPostList({ page, pageSize, key });
-    console.log(res);
-    list.value = res.data.postList;
-}
-loadingPost({});
 
+// 下拉刷新
+const listRef = ref<ListInstance>();
 const isLoading = ref(false);
 const onRefresh = async () => {
-    await loadingPost({});
+    const res = await loadingPost({});
+    list.value = res;
     isLoading.value = false;
+};
+
+// 底部加载
+const bottomLoading = ref(false);
+const finished = ref(false);
+const onLoad = async () => {
+    // 异步更新数据
+    const res = await getPostList({ key: searchValue.value });
+    list.value.push(...res);
+
+    // 加载状态结束
+    bottomLoading.value = false;
 };
 </script>
 
 <template>
     <van-sticky>
-        <van-search v-model="searchValue" placeholder="请输入搜索关键词" @search="onSearch" @update:model-value="changeValue"
-            @clear="loadingPost" />
+        <van-search v-model="searchValue" placeholder="请输入搜索关键词" @update:model-value="changeValue" />
     </van-sticky>
 
     <van-notice-bar left-icon="volume-o" mode="closeable" :text="notice" />
 
     <van-pull-refresh class="pull-refresh" v-model="isLoading" success-text="刷新成功" @refresh="onRefresh">
-        <van-card v-for="item in list" :title="item.title" :thumb="item.imgURL">
-            <template #desc>
-                <div class="desc">
-                    {{ item.summary }}
-                </div>
-            </template>
-            <template #price>
-                <van-space>
-                    <span>{{ item.author }}</span>
-                    <span>{{ item.date }}</span>
-                </van-space>
-            </template>
-            <template #num>
-                <van-space>
-                    <span>
-                        <van-icon name="good-job-o" />
-                        <span>446</span>
-                    </span>
-                    <span>
-                        <van-icon name="chat-o" />
-                        <span>49</span>
-                    </span>
-                </van-space>
-            </template>
-        </van-card>
+        <van-list ref="listRef" v-model:loading="bottomLoading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+            <van-card v-for="item in list" :title="item.title" :thumb="item.imgURL">
+                <template #desc>
+                    <div class="desc">
+                        {{ item.summary }}
+                    </div>
+                </template>
+                <template #price>
+                    <van-space>
+                        <span>{{ item.author }}</span>
+                        <span>{{ item.date }}</span>
+                    </van-space>
+                </template>
+                <template #num>
+                    <van-space>
+                        <span>
+                            <van-icon name="good-job-o" />
+                            <span>{{ item.liveTotal }}</span>
+                        </span>
+                        <span>
+                            <van-icon name="chat-o" />
+                            <span>{{ item.comentTotal }}</span>
+                        </span>
+                    </van-space>
+                </template>
+            </van-card>
+        </van-list>
     </van-pull-refresh>
     <van-back-top right="6vw" bottom="8vh" />
 </template>
 
 <style scoped>
-.notice-swipe {
-    height: 80px;
-    line-height: 80px;
-}
 
 .pull-refresh {
     flex: 1;

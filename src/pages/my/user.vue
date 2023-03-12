@@ -3,7 +3,6 @@ import { useUserStore } from '@/stores';
 import { useRouter } from 'vue-router';
 import { updateUser } from '@/api/user';
 import { upImg } from '@/api/upload';
-import user from '@/stores/user';
 
 const router = useRouter();
 // 顶部
@@ -29,7 +28,7 @@ const formdata = ref({ ...userStore.user });
 const saveUser = async () => {
     await updateUser(formdata.value);
     userStore.$patch((state) => {
-        Object.assign(state.user, formdata);
+        Object.assign(state.user, formdata.value);
     })
     onClickLeft();
 }

@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores';
 import { useRouter } from 'vue-router'
 
 const instance = axios.create({
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_BASE_URL,
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json'
@@ -24,7 +24,7 @@ instance.interceptors.response.use(response => {
         const userStore = useUserStore();
         userStore.token = response.data.token;
     }
-    return response;
+    return response.data;
 }, error => {
     if (error.response.status == 401) {
         const userStore = useUserStore();
