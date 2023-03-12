@@ -12,7 +12,6 @@ const changeValue = (() => {
             const res = await loadingPost({ key: value });
             list.value = res;
             listRef.value?.check();
-            console.log(listRef)
         }, 1500);
     }
 })()
@@ -33,6 +32,7 @@ const onRefresh = async () => {
     const res = await loadingPost({});
     list.value = res;
     isLoading.value = false;
+    listRef.value?.check();
 };
 
 // 底部加载
@@ -88,7 +88,6 @@ const onLoad = async () => {
 </template>
 
 <style scoped>
-
 .pull-refresh {
     flex: 1;
 }

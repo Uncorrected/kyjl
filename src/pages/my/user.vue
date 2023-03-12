@@ -2,7 +2,7 @@
 import { useUserStore } from '@/stores';
 import { useRouter } from 'vue-router';
 import { updateUser } from '@/api/user';
-import { upImg } from '@/api/upload';
+import { uploadImage } from '@/api/upload';
 
 const router = useRouter();
 // 顶部
@@ -19,8 +19,8 @@ const logout = () => {
 // 上传头像
 const fileList = ref([{ url: userStore.user.avatar }]);
 const upAvatar = async (file: any) => {
-    const res = await upImg(file);
-    userStore.user.avatar = res.data.avatar;
+    const res = await uploadImage(file);
+    userStore.user.avatar = res;
 }
 
 // 修改用户信息

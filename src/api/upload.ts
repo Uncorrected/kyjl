@@ -1,16 +1,16 @@
 import instance from '@/utils/request';
+import type { PostData } from './requestType';
 
-const api = {
-    upload: '/upload/image'
-}
 const config = {
     timeout: 0,
     headers: {
         'Content-Type': 'multipart/form-data'
     }
 }
-const upImg = (file: any) => instance.post(api.upload, file, config);
+const uploadImage: PostData<any, string> = (file) => {
+    return instance.post('/upload/image', file, config);
+}
 
 export {
-    upImg
+    uploadImage
 }
