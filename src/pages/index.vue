@@ -88,10 +88,6 @@ const onLoad = async () => {
 </template>
 
 <style scoped>
-.pull-refresh {
-    flex: 1;
-}
-
 .desc {
     word-break: break-all;
     text-overflow: ellipsis;

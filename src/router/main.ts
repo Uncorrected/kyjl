@@ -14,9 +14,9 @@ const mainRoutes: RouteRecordRaw[] = [
         name: 'Share',
         component: () => import('@/pages/share.vue'),
     }, {
-        path: '/word',
-        name: 'Word',
-        component: () => import('@/pages/word.vue'),
+        path: '/club',
+        name: 'Club',
+        component: () => import('@/pages/club.vue'),
     }, {
         path: '/my',
         name: 'My',

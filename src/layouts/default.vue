@@ -28,9 +28,9 @@ const tabbars = ref<tabbarType[]>([
         iconName: 'guide-o',
         name: '分享',
     }, {
-        pageName: '/word',
-        iconName: 'records',
-        name: '留言',
+        pageName: '/club',
+        iconName: 'friends-o',
+        name: '圈子',
     }, {
         pageName: '/my',
         iconName: 'user-o',
@@ -41,7 +41,7 @@ const tabbars = ref<tabbarType[]>([
 
 <template>
     <div class="main">
-        <van-nav-bar title="考研交流" @click-right="showNotify">
+        <van-nav-bar title="考研吧" @click-right="showNotify">
             <template #right>
                 <van-icon name="bell" color="gray" />
             </template>
@@ -68,7 +68,7 @@ const tabbars = ref<tabbarType[]>([
                 item.name
             }}</van-tabbar-item>
         </van-tabbar>
-        <div class="bottom-box"></div>
+        <!-- <div class="bottom-box"></div> -->
     </div>
 </template>
 
@@ -81,8 +81,8 @@ const tabbars = ref<tabbarType[]>([
 
 .container {
     flex: 1;
-    display: flex;
     flex-direction: column;
+    overflow: auto;
 }
 
 .bottom-box {
