@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { login, register } from '@/api/auth';
+import { login } from '@/api/auth';
+import { register } from '@/api/user';
 import { useUserStore } from '@/stores';
-import { showToast } from 'vant';
+import { showFailToast, showToast } from 'vant';
+import 'vant/es/toast/style';
 import { useRoute, useRouter } from 'vue-router';
 
 interface formType {
@@ -17,24 +19,34 @@ const form = ref<formType>({
     school: '',
 });
 const onLogin = async (values: any) => {
-    const res = await login(values);
-    // console.log(res);
-    const userStore = useUserStore();
-    userStore.$patch((state) => {
-        state.token = res.token;
-        state.user = res.user;
-    });
-    onBack();
+    try {
+        const res = await login(values);
+        const userStore = useUserStore();
+        userStore.$patch((state) => {
+            state.token = res.token;
+            state.user = res.user;
+        });
+        onBack();
+    } catch (error: any) {
+        if (error.status) {
+            showFailToast(`${error.message}\n错误代码\n${error.status}`);
+        } else {
+            showFailToast(`登录失败,请检查账号密码!`);
+        }
+    }
 };
 const onRegister = async (values: any) => {
-    const res = await register(values);
+    const keyWithValue = Object.entries(values).filter(([k, v]) => v);
+    const newObj = Object.fromEntries(keyWithValue);
+    await register(newObj as unknown as formType);
     showToast('注册成功');
+    active.value = 0;
 };
 
 const router = useRouter();
 const route = useRoute();
 const onBack = () => {
-    router.replace(route.query.origin as string)
+    router.back()
 };
 const active = ref(0);
 </script>
@@ -64,10 +76,8 @@ const active = ref(0);
                             :rules="[{ required: true, message: '请填写用户名' }]" required />
                         <van-field v-model="form.password" type="password" name="password" label="密码"
                             placeholder="你可以通过特殊手段找回它" :rules="[{ required: true, message: '请填写密码' }]" required />
-                        <van-field v-model="form.nickname" name="nickname" label="昵称" placeholder="取个好听的外号吧"
-                            :rules="[{ message: '请填写昵称' }]" />
-                        <van-field v-model="form.school" name="school" label="学校" placeholder="我无从校验，请您确保它的真实性"
-                            :rules="[{ message: '请填写所属学校' }]" />
+                        <van-field v-model="form.nickname" name="nickname" label="昵称" placeholder="我该怎么称呼您" />
+                        <van-field v-model="form.school" name="school" label="学校" placeholder="我无从校验，请您确保它的真实性" />
                     </van-cell-group>
                     <van-button round block type="primary" native-type="submit">
                         注册
@@ -77,5 +87,3 @@ const active = ref(0);
         </van-tabs>
     </div>
 </template>
-
-<style scoped></style>

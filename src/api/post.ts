@@ -7,7 +7,7 @@ interface queryTyep {
     key?: string,
 }
 interface postResponse {
-    readonly uuid: string,
+    readonly id: number,
     imgURL: string,
     title: string,
     author: string,

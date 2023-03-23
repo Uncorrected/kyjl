@@ -1,36 +1,87 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores';
 import { useRouter } from 'vue-router';
-import { updateUser } from '@/api/user';
+import { updateUser, alterPassword } from '@/api/user';
 import { uploadImage } from '@/api/upload';
+import { showFailToast, showToast, UploaderFileListItem } from 'vant';
+import 'vant/es/toast/style';
 
 const router = useRouter();
 // 顶部
 const onClickLeft = () => {
-    router.back();
+    router.replace({ name: 'My' });
 };
 const showBottom = ref(false)
 const userStore = useUserStore();
+const { user } = userStore;
 const logout = () => {
     userStore.$reset();
     onClickLeft();
 }
 
 // 上传头像
-const fileList = ref([{ url: userStore.user.avatar }]);
-const upAvatar = async (file: any) => {
-    const res = await uploadImage(file);
-    userStore.user.avatar = res;
+const fileList = ref<UploaderFileListItem[]>([{
+    url: userStore.user.avatar,
+    status: '',
+    message: '',
+},]);
+const upAvatar = async (files: any) => {
+    try {
+        let imgFile = new FormData();
+        // imgFile.append("fileType", 'IMAGE');
+        imgFile.append("avatar", files.file);
+        console.log(imgFile, files.file)
+        fileList.value[0].status = 'uploading';
+        fileList.value[0].message = '上传中';
+        const res = await uploadImage(imgFile);
+        // console.log(res)
+        user.avatar = res.avatar;
+    } catch (error: any) {
+        console.log(error)
+        if (error.statusCode) {
+            showFailToast(`${error.message}\n错误代码\n${error.statusCode}`);
+        } else {
+            showFailToast('未知错误！');
+        }
+    } finally {
+        fileList.value[0].status = '';
+        fileList.value[0].message = '';
+    }
 }
 
 // 修改用户信息
-const formdata = ref({ ...userStore.user });
+const formdata = ref({
+    nickname: user.nickname,
+    school: user.school
+});
 const saveUser = async () => {
-    await updateUser(formdata.value);
-    userStore.$patch((state) => {
-        Object.assign(state.user, formdata.value);
-    })
-    onClickLeft();
+    try {
+        await updateUser(formdata.value);
+        userStore.$patch((state) => {
+            Object.assign(state.user, formdata.value);
+        })
+        onClickLeft();
+    } catch (error: any) {
+        showFailToast(`${error.message}\n错误代码\n${error.statusCode}`);
+    }
+}
+
+const passwordForm = ref();
+const show = ref(false)
+const password = ref<string>('')
+const validator1 = (value: string) => /[0-9a-zA-Z]{1,32}/.test(value);
+const validatePWD = ref<string>('')
+const validator2 = (value: string) => value == password.value;
+
+// 修改密码
+const alterPWD = async (values: object) => {
+    try {
+        await alterPassword(password.value);
+        showBottom.value = false;
+        showToast('修改密码成功');
+    } catch (error) {
+        console.log(error);
+    }
 }
 </script>
 
@@ -42,7 +93,25 @@ const saveUser = async () => {
         </template>
     </van-nav-bar>
     <van-popup v-model:show="showBottom" position="bottom">
-        <van-button type="default" square block hairline>重置密码</van-button>
+        <div>
+            <van-dialog v-model:show="show" title="修改密码" show-cancel-button :show-confirm-button="false"
+                @cancel="() => showBottom = false">
+                <van-form ref="passwordForm" validate-trigger="onSubmit" @submit="alterPWD">
+                    <van-cell-group inset>
+                        <van-field v-model="password" required type="password" label="新密码" name="password" maxlength="32"
+                            show-word-limit :rules="[{ validator: validator1, message: '必须是数字字符串' }]" />
+                        <van-field v-model="validatePWD" required type="password" label="校验密码" name="validatePWD"
+                            maxlength="32" show-word-limit :rules="[{ validator: validator2, message: '必须和新密码一致' }]" />
+                    </van-cell-group>
+                    <div style="text-align: center;">
+                        <van-button type="primary" native-type="submit">
+                            同意
+                        </van-button>
+                    </div>
+                </van-form>
+            </van-dialog>
+            <van-button type="default" square block hairline @click="() => show = !show">修改密码</van-button>
+        </div>
         <van-button type="default" square block hairline @click="logout">退出登录</van-button>
     </van-popup>
     <van-space direction="vertical" fill size="24px">
@@ -56,7 +125,7 @@ const saveUser = async () => {
             </van-cell>
         </van-cell-group>
         <van-cell-group>
-            <van-field label="用户名" v-model="formdata.username" placeholder="请不要这样做，这会破坏系统完整性" />
+            <van-field label="用户名" v-model="user.username" placeholder="请不要这样做，这会破坏系统完整性" readonly />
             <van-field label="昵称" v-model="formdata.nickname" placeholder="我该怎么称呼您" />
             <van-field label="学校" v-model="formdata.school" placeholder="请输入高校名称" />
         </van-cell-group>

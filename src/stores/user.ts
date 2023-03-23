@@ -1,28 +1,36 @@
 import { defineStore } from "pinia";
 
-interface userType {
-    uuid: string,
-    username: string,
-    avatar: string,
-    nickname: string,
-    school: string,
-    isAdmin: boolean,
+export interface userType {
+  id: number;
+  username: string;
+  avatar: string;
+  email: string;
+  nickname: string;
+  school: string;
+  status: boolean;
+  isAdmin: boolean;
 }
 
-export default defineStore('user', () => {
-    const token = ref<string>('');
+export default defineStore(
+  "user",
+  () => {
+    const token = ref<string>("");
     const user = ref<userType>({
-        uuid: '',
-        username: '',
-        avatar: '',
-        nickname: '',
-        school: '',
-        isAdmin: false,
+      id: 0,
+      username: "",
+      avatar: "",
+      email: "",
+      nickname: "",
+      school: "",
+      status: false,
+      isAdmin: false,
     });
     return {
-        token,
-        user
-    }
-}, {
-    persist: true
-})
+      token,
+      user,
+    };
+  },
+  {
+    persist: true,
+  }
+);

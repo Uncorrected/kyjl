@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "vant": "^4.1.0",
+    "vditor": "^3.9.1",
     "vue": "^3.2.45",
     "vue-advanced-chat": "https://github.com/antoine92190/vue-advanced-chat/tarball/next"
   },

@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import AutoImport from 'unplugin-auto-import/vite';
-import Components from 'unplugin-vue-components/vite';
-import { VantResolver } from 'unplugin-vue-components/resolvers';
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { VantResolver } from "unplugin-vue-components/resolvers";
 import postcssPxToViewport from "postcss-px-to-viewport-8-plugin";
 
 // https://vitejs.dev/config/
@@ -11,8 +11,8 @@ export default defineConfig({
     vue(),
     AutoImport({
       // 自动导入 Vue 相关函数，如：ref, reactive, toRef 等
-      imports: ['vue'],
-      dts: 'src/auto-import.d.ts',
+      imports: ["vue"],
+      dts: "src/auto-import.d.ts",
     }),
     Components({
       resolvers: [VantResolver()],
@@ -24,23 +24,23 @@ export default defineConfig({
         postcssPxToViewport({
           viewportWidth: 375,
         }),
-      ]
-    }
+      ],
+    },
   },
   resolve: {
     alias: {
-      '@': '/src',
+      "@": "/src",
     },
   },
   server: {
     host: true,
-    // proxy: {
-    //   "/api": {
-    //     target: 'https://mock.apifox.cn/m1/2414200-0-default',
-    //     // target: 'http://localhost:3000/api',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, "")
-    //   }
-    // }
+    proxy: {
+      "/api": {
+        // target: 'https://mock.apifox.cn/m1/2414200-0-default',
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
-})
+});

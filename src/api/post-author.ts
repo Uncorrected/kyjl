@@ -1,7 +1,7 @@
 import instance from '@/utils/request';
 
-const countLive = (postUUID: string) => instance.get(`/post_author/${postUUID}/live`, { params: { count: 1 } });
-const countLiveMany = (postUUID: string) => instance.get(`/post_author/${postUUID}/live`, { params: { count: 1 } });
+const countLive = (postid: number) => instance.get(`/post_author/${postid}/live`, { params: { count: 1 } });
+const countLiveMany = (postid: number) => instance.get(`/post_author/${postid}/live`, { params: { count: 1 } });
 export {
     countLive,
     countLiveMany

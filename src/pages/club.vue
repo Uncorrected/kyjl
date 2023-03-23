@@ -25,7 +25,7 @@ const messages = ref<Messages>([]);
 const fetchMessages = () => {
     messagesLoaded.value = false
     setTimeout(async () => {
-        const res = await fetch(`https://mock.apifox.cn/m1/2414200-0-default/rooms/{uuid}/message`);
+        const res = await fetch(`https://mock.apifox.cn/m1/2414200-0-default/rooms/{id}/message`);
         const data = await res.json();
         const temp = [...messages.value, ...data];
         messages.value = temp;
